@@ -7,34 +7,39 @@
     <title>Document</title>
 </head>
 
-<script>
-    const addMore = document.querySelector(".add-more");
-    let fInput = document.querySelector(".more-date");
-
-    addMore.addEventListener("click", function (e) {
-        e.preventDefault();
-        let newFInput = fInput.cloneNode();
-        fInput.parentNode.insertBefore(newFInput, fInput.nextSibling);
-        fInput = newFInput;
-    }
-    );
-</script>
-
+<html>
 <body>
-    <form method="post">
-        <div class="field">
-            <label for="event">Event:</label>
-            <input type="text" name="event">
-        </div>
-        <div class="field">
-            <label for="date">Date:</label>
-            <input type="date" name="date[]" class="more-date" required>
-        </div>
-        <div>
-            <button class="add-more" type="button">Add date...</button>
-        </div>
-        <input type="submit" value="Make Booking">
-    </form>
+
+<form id="myForm" method="post">
+    <input type="submit"> <br>
+    <label for="IDclassYear">ID:</label> <label for="class">Class:</label> <label for="gradYear">Year:</label> <label for="time">Time:</label> <br>
+    <input id="IDclassYear" type="text" name="IDclassYear[0]" placeholder="ID 1"> 
+    <input id="class" type="text" name="class[0]" placeholder="Class 1"> 
+    <input id="gradYear"type="text" name="gradYear[0]" placeholder="Year 1">
+    <input id="time" type="text" name="time[0]" placeholder="Time 1">
+    
+</form> 
+<button onclick="addOption();">Add Class</button> 
+
+<script> 
+    var optionNumber = 1; //The first option to be added is number 1 
+    const idList = ["IDclassYear", "class", "gradYear", "time"];
+    const placeholderList = ["ID", "Class", "Year", "Time"];
+    function addOption() { 
+        var theForm = document.getElementById("myForm"); 
+        for (let i= 0; i < 4; i++) {
+            var newOption = document.createElement("input");
+            newOption.id = idList[i] + optionNumber;
+            newOption.name = idList[i] + "[" + optionNumber + "]";
+            newOption.type = "text";
+            newOption.placeholder = placeholderList[i] + " " + (optionNumber + 1);
+            theForm.appendChild(newOption); 
+            
+        }
+        optionNumber++;
+    } 
+</script>
 </body>
+</html>
 
 </html>
