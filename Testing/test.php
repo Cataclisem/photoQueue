@@ -23,7 +23,10 @@
         </form> 
         <button onclick="addOption();">Add Class</button> 
 
-        <div id="DataBaseDisplay"style='width: 50%; margin-left: 25%;'></div>
+       <form id="DataBaseDisplay" method="post" > <br>
+        <input type="submit" name="delete" value="Delete From DataBase"> <input type="submit" name="addTime" value="Add time to selected: "><input type="text" name="addedTime" placeholder="Minutes" pattern="[1-9][0-9]*">
+        <input type="hidden" name="action" value="edit_database">
+        </form> 
 
         <script> 
             var optionNumber = 1; //The first option to be added is number 1 
@@ -168,7 +171,7 @@ function HTMLDisplayString($result = array()) {
 	foreach ($result as $row) {
         $time = substr($row["time"], 0, -3);
             echo "<script>
-            document.getElementById('DataBaseDisplay').insertAdjacentHTML('beforeend', '<div id=\"{$time}:00\"> <input type=\"checkbox\"> <h4 style=\"display:inline\">{$row['class']} </h4> <h4 style=\"display:inline\">{$row['gradYear']} </h4> <h4 style=\"display:inline\">{$time} </h4> </div> <br>'); 
+            document.getElementById('DataBaseDisplay').insertAdjacentHTML('beforeend', '<div id=\"{$time}:00\" name=\"{$time}:00\"> <input type=\"checkbox\"> <h4 style=\"display:inline\">{$row['class']} </h4> <h4 style=\"display:inline\">{$row['gradYear']} </h4> <h4 style=\"display:inline\">{$time} </h4> </div> <br>'); 
                 document.getElementById('DataBaseDisplay').insertAdjacentHTML('beforeend', '<hr id=\"{$time}:00\" style=\"width:80%;text-align:centered;margin-left:10%\">');
                 </script>
             ";
@@ -176,7 +179,9 @@ function HTMLDisplayString($result = array()) {
 }
 
 getFromDB($conn);
-sendToDB($conn, $_POST);
+//sendToDB($conn, $_POST);
+
+print_r($_POST);
 
 mysqli_close($conn);
 ?>
