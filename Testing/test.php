@@ -7,6 +7,13 @@
     <title>Document</title>
 </head>
    <body>
+    <script>
+        function deleteEle() {
+            document.getElementById("10:00:00").remove();
+        }
+    </script>
+
+    <button onclick="deleteEle();" method="post">Remove Element</button>
         <form id="myForm"  method="post" > <!--Change the action to the page you want to submit the form to. action="https://www.example.com/submit" <input type="hidden" name="action" value="post_to_DB">-->
              <br> 
             <input id="class0" type="text" name="class[0]" placeholder="Klasse nr. 1" pattern="[1-3]\.[a-z]{1,2}" title="Format: 3.x, 2.a, 3.ux,..."> 
@@ -15,6 +22,8 @@
             <input type="submit" name="submit">
         </form> 
         <button onclick="addOption();">Add Class</button> 
+
+        <div id="DataBaseDisplay"style='width: 50%; margin-left: 25%;'></div>
 
         <script> 
             var optionNumber = 1; //The first option to be added is number 1 
@@ -150,10 +159,19 @@ function sendToDB($conn, $POST) {
 function getFromDB($conn) {
     $sqlQuerry = "SELECT * FROM queue";
     $result = mysqli_query($conn, $sqlQuerry);
-    foreach ($result as $row) {
+    HTMLDisplayString($result);
+}
+
+
+
+function HTMLDisplayString($result = array()) {
+	foreach ($result as $row) {
         $time = substr($row["time"], 0, -3);
-		echo "<h4 style='display:inline'>{$row['class']} </h4> <h4 style='display:inline'>{$row['gradYear']} </h4> <h4 style='display:inline'>{$time} </h4> <br>";
-		echo "<hr style='width:80%;text-align:centered;margin-left:10%'>";
+            echo "<script>
+            document.getElementById('DataBaseDisplay').insertAdjacentHTML('beforeend', '<div id=\"{$time}:00\"> <input type=\"checkbox\"> <h4 style=\"display:inline\">{$row['class']} </h4> <h4 style=\"display:inline\">{$row['gradYear']} </h4> <h4 style=\"display:inline\">{$time} </h4> </div> <br>'); 
+                document.getElementById('DataBaseDisplay').insertAdjacentHTML('beforeend', '<hr id=\"{$time}:00\" style=\"width:80%;text-align:centered;margin-left:10%\">');
+                </script>
+            ";
     }
 }
 
