@@ -31,18 +31,6 @@ do_action( 'admin_init' );
  * 
  */
 
-function testfunc3() {
-	echo "testfunc3 <br>";
-}
-
-function testfunc4() {
-	echo "testfunc4 <br>";
-	echo "POST:";
-	print_r($_POST);
-	echo "<br> REQUEST: ";
-	print_r($_REQUEST);
-}
-
 function changeTimeFormat($time) {
 	$time = "{$time}:00";
 	return $time;
@@ -50,20 +38,19 @@ function changeTimeFormat($time) {
 
 function addToDB(){
 	global $wpdb;
-	for ($i = 0; $i < count($_POST["IDclassYear"]); $i++) {
-		$IDyearClass = $_POST["IDclassYear"][$i];
+	for ($i = 0; $i < count($_POST["class"]); $i++) {
 		$class = $_POST["class"][$i];
 		$gradYear = $_POST["gradYear"][$i];
 		$time = changeTimeFormat($_POST["time"][$i]);
-		$data = array("IDYearClass"=>$IDyearClass, "class"=>$class, "gradYear"=>$gradYear, "time"=>$time);
+		$data = array("class"=>$class, "gradYear"=>$gradYear, "time"=>$time);
 		
 		if (!$wpdb->insert("Queue", $data)) {
 			print_r($wpdb->last_error);
-			echo "<br> Something went wrong when intserting the {$IDyearClass} data. Check if the data is correct or is a duplication and try again.";
-			exit();
+			echo "<br> Something went wrong when intserting the class {$gradYear} {$class} with time {$time} data. Check if the data is correct or is a duplication and try again.";
 		}
 	}
-	wp_safe_redirect("https://example.com/redirect"); //Change this to the page you want to redirect to after the form is submitted
+	wp_safe_redirect(home_url()); //Change this to the page you want to redirect to after the form is submitted
+	exit();
 }
 
 
@@ -85,7 +72,6 @@ if ( ! is_scalar( $action ) ) {
 
 if ( ! is_user_logged_in() ) {
 	if ( empty( $action ) ) {
-		echo "action: admin_post_nopriv <br>";
 		/**
 		 * Fires on a non-authenticated admin post request where no action is supplied.
 		 *
@@ -93,7 +79,6 @@ if ( ! is_user_logged_in() ) {
 		 */
 		do_action( 'admin_post_nopriv' );
 	} else {
-		//echo "action: admin_post_nopriv_{$action} <br>";
 		// If no action is registered, return a Bad Request response.
 		if ( ! has_action( "admin_post_nopriv_{$action}" ) ) {
 			wp_die( '', 400 );
@@ -111,7 +96,6 @@ if ( ! is_user_logged_in() ) {
 	}
 } else {
 	if ( empty( $action ) ) {
-		echo "action: admin_post <br>";
 		/**
 		 * Fires on an authenticated admin post request where no action is supplied.
 		 *
@@ -119,7 +103,6 @@ if ( ! is_user_logged_in() ) {
 		 */
 		do_action( 'admin_post' );
 	} else {
-		echo "action: admin_post_{$action} <br>";
 		// If no action is registered, return a Bad Request response.
 		if ( ! has_action( "admin_post_{$action}" ) ) {
 			wp_die( '', 400 );

@@ -57,9 +57,9 @@ $conn = NULL;
 
 $conn = mysqli_connect($db_server, $db_user, $db_pass, $db_name);
 
-function insertSQL($conn, $IDyearClass, $class, $gradYear, $time)
+function insertSQL($conn, $class, $gradYear, $time)
 {
-	$sqlQuerry = "INSERT INTO queue (IDyearClass, class, gradYear, time) VALUES ('$IDyearClass', '$class', $gradYear, '$time')";
+	$sqlQuerry = "INSERT INTO queue (class, gradYear, time) VALUES ('$class', $gradYear, '$time')";
 	try {
 		mysqli_query($conn, $sqlQuerry);
 		echo "Class added";
@@ -74,34 +74,25 @@ function changeTimeFormat($time) {
 }
 
 function sendToDB($conn, $POST) {
-	for ($i = 0; $i < count($POST["IDclassYear"]); $i++) {
-		$IDyearClass = $POST["IDclassYear"][$i];
+	for ($i = 0; $i < count($POST["class"]); $i++) {
 		$class = $POST["class"][$i];
 		$gradYear = $POST["gradYear"][$i];
 		$time = changeTimeFormat($POST["time"][$i]);
-		insertSQL($conn, $IDyearClass, $class, $gradYear, $time);
+		insertSQL($conn, $class, $gradYear, $time);
 	}
 }
 
-//sendToDB($conn, $_POST);
 
-//print_r($_SERVER);
+function getFromDB($conn) {
+    $sqlQuerry = "SELECT * FROM queue";
+    $result = mysqli_query($conn, $sqlQuerry);
+    foreach ($result as $row) {
+        $time = substr($row->time, 0, -3);
+		echo "<h4 style='display:inline'>{$row->class} </h4> <h4 style='display:inline'>{$row->gradYear} </h4> <h4 style='display:inline'>{$time} </h4> <br>";
+		echo "<hr style='width:80%;text-align:centered;margin-left:10%'>";
+    }
+}
 
-//for ($i = 0; $i < count($_POST["IDclassYear"]); $i++) {
-//	foreach ($_POST as $key => $value) {
-//		echo "key: {$key} value: {$value[$i]} <br>";
-//	}
-//}
-
-//insertSQL($conn, "2018y", "3.y", 2021, "18:30:00");
-$count = 0;
-
-print_r($_POST['submit']);
-var_dump('<pre>', $_POST);
-if (isset($_POST['submit'])) {   
-    echo "submit is set {$count}";  
-        $count++;  
-    $_POST['submit'] = null;}
 
 mysqli_close($conn);
 ?>
