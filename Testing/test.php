@@ -176,7 +176,6 @@ function HTMLDisplayString($result = array()) {
 }
 
 getFromDB($conn);
-
 sendToDB($conn, $_POST);
 
 mysqli_close($conn);
