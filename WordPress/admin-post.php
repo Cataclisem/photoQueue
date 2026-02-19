@@ -95,10 +95,9 @@ function addToDB(){
         	$time = changeTimeFormat(filterTime($_POST["time"][$i]));
 			$data = array("class"=>$class, "gradYear"=>$gradYear, "time"=>$time);
 			if (!$wpdb->insert("Queue", $data)) {
-				print_r($wpdb->last_error);
-				echo "<br> Something went wrong when intserting the class {$gradYear} {$class} with time {$time} data. Check if the data is correct or is a duplication and try again.";
+				throw new Exception(print_r($wpdb->last_error) ."<br> Something went wrong when intserting the class {$gradYear} {$class} with time {$time} data. Check if the data is correct or is a duplication and try again." );
 			}
-			wp_safe_redirect(home_url()); //Change this to the page you want to redirect to after the form is submitted
+			wp_safe_redirect('https://kristiansenz.com/queueadmin/'); //Change this to the page you want to redirect to after the form is submitted
 			exit();
 
 		} catch (Exception $e) {

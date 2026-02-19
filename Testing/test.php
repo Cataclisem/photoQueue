@@ -11,21 +11,42 @@
         function deleteEle() {
             document.getElementById("10:00:00").remove();
         }
+
+        /** Check all checkboxes with the name starting with "checkbox_" when the "Check all" checkbox is checked, and uncheck them when it is unchecked.
+         *  @param object initial_checkbox The "Check all" checkbox that was clicked.
+         *  @return void
+         */
+        function check_all(initial_checkbox) {
+            var checkboxes = document.querySelectorAll('input[type=\"checkbox\"]');
+            if (initial_checkbox.checked) {
+                for (let checkbox of checkboxes) {
+                    if (checkbox.name.startsWith("checkbox_") && !checkbox.checked) {
+                        checkbox.checked = true;
+                    }  
+                }
+            } else {
+                for (let checkbox of checkboxes) {
+                    if (checkbox.name.startsWith("checkbox_") && checkbox.checked) {
+                        checkbox.checked = false;
+                    }  
+                }
+            }
+        }
     </script>
 
-    <button onclick="deleteEle();" method="post">Remove Element</button>
+    <button onclick="deleteEle();" method="post">Remove Element</button> <form method="post"><input type="submit" name="clearPost"  value="Clear $_POST"></form>
         <form id="myForm"  method="post" > <!--Change the action to the page you want to submit the form to. action="https://www.example.com/submit" <input type="hidden" name="action" value="post_to_DB">-->
-             <br> 
+            <input type="submit" name="submit_to_DB" value="Submit to DataBase"><br>
             <input id="class0" type="text" name="class[0]" placeholder="Klasse nr. 1" pattern="[1-3]\.[a-z]{1,2}" title="Format: 3.x, 2.a, 3.ux,..."> 
             <input id="gradYear0" type="text" name="gradYear[0]" placeholder="Dimittend år nr. 1" pattern="[0-9]{4}" title="Format: 2019, 1988, 2006...">
-            <input id="time0" type="text" name="time[0]" placeholder="Tidspunkt nr. 1" pattern="[0-2]{1}[0-9]{1}:[0-6]{1}[0-9]{1}" title="Format: 12:34, 14:40, 09:36,..."> <br>
-            <input type="submit" name="submit">
+            <input id="time0" type="text" name="time[0]" placeholder="Tidspunkt nr. 1" pattern="[0-2]{1}[0-9]{1}:[0-6]{1}[0-9]{1}" title="Format: 12:34, 14:40, 09:36,..."> <br> 
         </form> 
         <button onclick="addOption();">Add Class</button> 
 
        <form id="DataBaseDisplay" method="post" > <br>
-        <input type="submit" name="delete" value="Delete From DataBase"> <input type="submit" name="addTime" value="Add time to selected: "><input type="text" name="addedTime" placeholder="Minutes" pattern="[1-9][0-9]*">
+        <input type="submit" name="delete" value="Delete From DataBase"> <input type="submit" name="addTime" value="Add time to selected: "><input type="number" name="addedTime" placeholder="Minutes" min=-720 max=720>
         <input type="hidden" name="action" value="edit_database">
+        <input type="checkbox" name="checkall" value="Check All" onClick="check_all(this.form['checkall']);">Check all<br>
         </form> 
 
         <script> 
@@ -44,7 +65,7 @@
                     newOption.type = "text"; 
                     newOption.placeholder = placeholderList[i] + " " + (optionNumber + 1);
 
-                    if (i == 3) {    //If the input is the last one, add a line break after it
+                    if (i == 2) {    //If the input is the last one, add a line break after it
                         theForm.appendChild(newOption)
                         theForm.appendChild(document.createElement("br"));
                     }
@@ -66,6 +87,133 @@ $db_name = "test";
 $conn = NULL;
 
 $conn = mysqli_connect($db_server, $db_user, $db_pass, $db_name);
+
+//----------- functions.php -----------
+
+/**
+ *  Get data from the database and display it.
+ *  @param object $conn The database connection.
+ *  @return void
+ */
+function getFromDB($conn) {
+    $sqlQuerry = "SELECT * FROM queue";
+    $result = mysqli_query($conn, $sqlQuerry);
+    HTMLDisplayString($result);
+}
+
+
+
+function HTMLDisplayString($result = array()) {
+	foreach ($result as $row) {
+        $time = substr($row["time"], 0, -3);
+        $cleanID = str_replace(":", "_", $row["time"]);
+            echo "<script>
+                document.getElementById('DataBaseDisplay')
+                    .insertAdjacentHTML('beforeend', 
+                        '<div id=\"{$cleanID}\" name=\"{$cleanID}\"> \
+                            <input type=\"checkbox\" name=\"checkbox_{$cleanID}\"> \
+                            <h4 style=\"display:inline\">{$row['class']} </h4> \
+                            <h4 style=\"display:inline\">{$row['gradYear']} </h4> \
+                            <h4 style=\"display:inline\">{$time} </h4>\
+                        </div> <br>'); 
+                document.getElementById('DataBaseDisplay')
+                    .insertAdjacentHTML('beforeend', 
+                        '<hr id=\"{$cleanID}\" style=\"width:80%;text-align:centered;margin-left:10%\">');
+                </script>";
+    }
+}
+
+
+function clearPOST(){
+    if (isset($_POST["clearPost"])) {
+        echo "I am clearing";
+        $_POST = array();
+    }
+}
+
+getFromDB($conn);
+
+sendToDB($conn);
+
+
+//echo print_r($_POST) . "<br>";
+checkForAddTimeOrDeleteEntry($conn);
+clearPOST();
+//echo "<br>";
+//print_r($_POST);
+
+//----------- admin-post.php -----------
+
+function checkForAddTimeOrDeleteEntry($conn) {
+    if (isset($_POST["delete"])) {
+        deleteFromDB($conn);
+
+    } else if (isset($_POST["addTime"])) {
+        addTimeToSelected($conn);
+    }
+}
+
+function deleteFromDB($conn) {
+    $checkedBoxes = getArrayOfCheckedBoxes();
+    foreach ($checkedBoxes as $time) {
+        $sqlQuerry = "DELETE FROM queue WHERE time = '{$time}'";
+        try {
+            mysqli_query($conn, $sqlQuerry);
+            echo "Class deleted";
+        } catch (mysqli_sql_exception $e) {
+            echo 'Database error: ' . mysqli_error($conn);
+        }
+    } 
+}
+
+function filterExtraTimeInput($addedTime) {
+    if (filter_var($addedTime, FILTER_VALIDATE_INT, array("options" => array("min_range" => -720, "max_range" => 720)))) {
+        return $addedTime;
+    } else {
+        throw new Exception("{$addedTime} is an Invalid time to add. Please enter a positive integer.");
+    }
+}
+
+function addTimeToSelected($conn) {
+    $checkedBoxes = getArrayOfCheckedBoxes();
+    $addedTime = filterExtraTimeInput($_POST["addedTime"]);
+    $hours = intdiv($addedTime, 60);
+    $minutes = $addedTime % 60;
+    foreach ($checkedBoxes as $time) {
+        $sqlQuerry = "UPDATE queue SET time = ADDTIME(time, '{$hours}:{$minutes}:00') WHERE time = '{$time}'";
+        try {
+            mysqli_query($conn, $sqlQuerry);
+            echo "Time added";
+        } catch (mysqli_sql_exception $e) {
+            echo 'Database error: ' . mysqli_error($conn);
+        }
+    }
+}
+
+function checkIfCorrectCheckBoxID($checkboxID){
+    if (!strcmp(substr($checkboxID, 0, 9), "checkbox_")) {
+        return true;
+    } else  {
+        return false;
+    }
+}
+
+function getArrayOfCheckedBoxes() {
+    $checkedBoxes = array();
+    foreach ($_POST as $key => $value) {
+        if (checkIfCorrectCheckBoxID($key) and $value == "on") {
+            array_push($checkedBoxes, getDatabaseIDFromCheckBoxID($key));
+        }
+    }
+    return $checkedBoxes;
+}
+
+function getDatabaseIDFromCheckBoxID($checkboxID) {
+    $databaseID = substr($checkboxID, 9);
+    return str_replace("_", ":", $databaseID);
+}
+
+//----------- Inserting Classes into Database -----------
 
 /**
  * Insert a class into the database. By using an SQL querry, the class, graduation  year and time are inserted into the database
@@ -141,47 +289,30 @@ function filterClass($class) {
  *  @param array $POST The POST data.
  *  @return void
  */
-function sendToDB($conn, $POST) {
-	for ($i = 0; $i < count($POST["class"]); $i++) {
-        try {
-            $class = filterClass($POST["class"][$i]);
-            $gradYear = filterGradYear($POST["gradYear"][$i]);
-            $time = changeTimeFormat(filterTime($POST["time"][$i]));
-            insertSQL($conn, $class, $gradYear, $time);
-        } catch (Exception $e) {
-            echo $e->getMessage();
-        }
-	}
-}
-
-/**
- *  Get data from the database and display it.
- *  @param object $conn The database connection.
- *  @return void
- */
-function getFromDB($conn) {
-    $sqlQuerry = "SELECT * FROM queue";
-    $result = mysqli_query($conn, $sqlQuerry);
-    HTMLDisplayString($result);
-}
-
-
-
-function HTMLDisplayString($result = array()) {
-	foreach ($result as $row) {
-        $time = substr($row["time"], 0, -3);
-            echo "<script>
-            document.getElementById('DataBaseDisplay').insertAdjacentHTML('beforeend', '<div id=\"{$time}:00\" name=\"{$time}:00\"> <input type=\"checkbox\"> <h4 style=\"display:inline\">{$row['class']} </h4> <h4 style=\"display:inline\">{$row['gradYear']} </h4> <h4 style=\"display:inline\">{$time} </h4> </div> <br>'); 
-                document.getElementById('DataBaseDisplay').insertAdjacentHTML('beforeend', '<hr id=\"{$time}:00\" style=\"width:80%;text-align:centered;margin-left:10%\">');
-                </script>
-            ";
+function sendToDB($conn) {
+    if (isset($_POST["submit_to_DB"])) {
+        echo "I am sending to the database";
+	    for ($i = 0; $i < count($_POST["class"]); $i++) {
+            try {
+                $class = filterClass($_POST["class"][$i]);
+                $gradYear = filterGradYear($_POST["gradYear"][$i]);
+                $time = changeTimeFormat(filterTime($_POST["time"][$i]));
+                insertSQL($conn, $class, $gradYear, $time);
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+	    }
     }
 }
-
-getFromDB($conn);
-//sendToDB($conn, $_POST);
-
-print_r($_POST);
-
 mysqli_close($conn);
+/** 
+ *   $sqlQuerry = "DELETE FROM queue WHERE time = '10:00:00'";
+ *   try {
+ *       mysqli_query($conn, $sqlQuerry);
+ *       echo "Class deleted";
+ *   } catch (mysqli_sql_exception $e) {
+ *       echo 'Database error: ' . mysqli_error($conn);
+ *   }
+ */
+
 ?>
