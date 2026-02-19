@@ -42,13 +42,19 @@ add_action( 'admin_post_nopriv_edit_database', 'checkForAddTimeOrDeleteEntry' );
  * @return void.
  */
 function checkForAddTimeOrDeleteEntry($conn) {
-    if (isset($_POST["delete"])) {
-        deleteFromDB();
-    } else if (isset($_POST["addTime"])) {
-        addTimeToSelected();
-    }
-	wp_safe_redirect('https://kristiansenz.com/queueadmin/'); //Change this to the page you want to redirect to after the form is submitted
-	exit();
+	try {
+    	if (isset($_POST["delete"])) {
+    	    deleteFromDB();
+    	} else if (isset($_POST["addTime"])) {
+    	    addTimeToSelected();
+    	}
+		wp_safe_redirect('https://kristiansenz.com/queueadmin/'); //Change this to the page you want to redirect to after the form is submitted
+		exit();
+	} catch (Exception $e) {
+		echo $e->getMessage();
+		exception_return();
+		exit();
+	}
 }
 
 /**
@@ -60,17 +66,13 @@ function deleteFromDB() {
 	global $wpdb;
     $checkedBoxes = getArrayOfCheckedBoxes();
     foreach ($checkedBoxes as $time) {
-        $sqlQuery = "DELETE FROM queue WHERE time = '{$time}'";;
-        try {
-			if (!filter_var($time, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[0-2][0-9]:[0-5][0-9]:00$/")))) {
-				throw new Exception("{$time} is an Invalid time. Something went wrong when trying to delete the class with time {$time} from the database. Check if the time is correct and try again.");
-			} 
-			if (!$wpdb->query($sqlQuery)) {
-				throw new Exception(print_r($wpdb->last_error));
-			}
-        } catch (Exception $e) {
-            echo $e->getMessage();
-        }
+        $sqlQuery = "DELETE FROM Queue WHERE time = '{$time}'";;
+		if (!filter_var($time, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[0-2][0-9]:[0-5][0-9]:00$/")))) {
+			throw new Exception("{$time} is an Invalid time. Something went wrong when trying to delete the class with time {$time} from the database. Check if the time is correct and try again.");
+		} 
+		if (!$wpdb->query($sqlQuery)) {
+			throw new Exception(print_r($wpdb->last_error));
+		}
     }
 }
 
@@ -90,14 +92,23 @@ function addTimeToSelected() {
     $hours = intdiv($addedTime, 60);
     $minutes = $addedTime % 60;
     foreach ($checkedBoxes as $time) {
-        $sqlQuery = "UPDATE queue SET time = ADDTIME(time, '{$hours}:{$minutes}:00') WHERE time = '{$time}'";
-        try {
-            if (!$wpdb->query($sqlQuery)) {
-				throw new Exception(print_r($wpdb->last_error));
-			}
-        } catch (Exception $e) {
-            echo $e->getMessage();
-        }
+        $sqlQuery = "UPDATE Queue SET time = ADDTIME(time, '{$hours}:{$minutes}:00') WHERE time = '{$time}'";
+        if (!$wpdb->query($sqlQuery)) {
+			throw new Exception(print_r($wpdb->last_error));
+		}
+    }
+}
+
+/**
+ *  Filter time input.
+ *  @param string $addedTime The time to filter.
+ *  @return int The filtered time in minutes.
+ */
+function filterExtraTimeInput($addedTime) {
+    if (filter_var($addedTime, FILTER_VALIDATE_INT, array("options" => array("min_range" => -720, "max_range" => 720)))) {
+        return $addedTime;
+    } else {
+        throw new Exception("{$addedTime} is an Invalid time to add. Please enter a positive integer.");
     }
 }
 
@@ -140,6 +151,10 @@ function getDatabaseIDFromCheckBoxID($checkboxID) {
 }
 
 // ------------------------ Adding to Database Functions ------------------------
+
+//add_action( 'admin_post_post_to_DB', 'testfunc3' );
+add_action( 'admin_post_nopriv_post_to_DB', 'addToDB' );
+
 /**
  *  Change the time format to HH:MM:SS.
  *  @param string $time The time to change.
@@ -209,15 +224,18 @@ function addToDB(){
 			}
 		} catch (Exception $e) {
 		echo $e->getMessage();
+		exception_return();
 		}
 	}
 	wp_safe_redirect('https://kristiansenz.com/queueadmin/'); //Change this to the page you want to redirect to after the form is submitted
 	exit();
 }
 
-//add_action( 'admin_post_post_to_DB', 'testfunc3' );
-add_action( 'admin_post_nopriv_post_to_DB', 'addToDB' );
+// ----- Some exception handeling for the functions above -----
 
+function exception_return(){
+	echo "<br> <a href='https://kristiansenz.com/queueadmin/' style='font-size:xx-large'>Return to Queue Admin</a> <br>";
+}
 
 /** 
  * Below is code i don't know what do, but its fine

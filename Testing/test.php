@@ -171,11 +171,15 @@ clearPOST();
  * @return void.
  */
 function checkForAddTimeOrDeleteEntry($conn) {
-    if (isset($_POST["delete"])) {
-        deleteFromDB($conn);
+    try{
+        if (isset($_POST["delete"])) {
+            deleteFromDB($conn);
 
-    } else if (isset($_POST["addTime"])) {
-        addTimeToSelected($conn);
+        } else if (isset($_POST["addTime"])) {
+            addTimeToSelected($conn);
+        }
+    } catch (Exception $e) {
+        echo $e->getMessage();
     }
 }
 
@@ -188,12 +192,7 @@ function deleteFromDB($conn) {
     $checkedBoxes = getArrayOfCheckedBoxes();
     foreach ($checkedBoxes as $time) {
         $sqlQuerry = "DELETE FROM queue WHERE time = '{$time}'";
-        try {
-            mysqli_query($conn, $sqlQuerry);
-            echo "Class deleted";
-        } catch (mysqli_sql_exception $e) {
-            echo 'Database error: ' . mysqli_error($conn);
-        }
+        mysqli_query($conn, $sqlQuerry);
     } 
 }
 
@@ -216,18 +215,13 @@ function filterExtraTimeInput($addedTime) {
  *  @return void
  */
 function addTimeToSelected($conn) {
-    $checkedBoxes = getArrayOfCheckedBoxes();
     $addedTime = filterExtraTimeInput($_POST["addedTime"]);
     $hours = intdiv($addedTime, 60);
     $minutes = $addedTime % 60;
+    $checkedBoxes = getArrayOfCheckedBoxes();
     foreach ($checkedBoxes as $time) {
         $sqlQuery = "UPDATE queue SET time = ADDTIME(time, '{$hours}:{$minutes}:00') WHERE time = '{$time}'";
-        try {
-            mysqli_query($conn, $sqlQuery);
-            echo "Time added";
-        } catch (mysqli_sql_exception $e) {
-            echo 'Database error: ' . mysqli_error($conn);
-        }
+        mysqli_query($conn, $sqlQuery);
     }
 }
 
