@@ -12,27 +12,22 @@
             document.getElementById("10:00:00").remove();
         }
 
-        /** Check all checkboxes with the name starting with "checkbox_" when the "Check all" checkbox is checked, and uncheck them when it is unchecked.
-         *  @param object initial_checkbox The "Check all" checkbox that was clicked.
-         *  @return void
-         */
-        function check_all(initial_checkbox) {
-            var checkboxes = document.querySelectorAll('input[type=\"checkbox\"]');
-            if (initial_checkbox.checked) {
-                for (let checkbox of checkboxes) {
-                    if (checkbox.name.startsWith("checkbox_") && !checkbox.checked) {
-                        checkbox.checked = true;
-                    }  
-                }
-            } else {
-                for (let checkbox of checkboxes) {
-                    if (checkbox.name.startsWith("checkbox_") && checkbox.checked) {
-                        checkbox.checked = false;
-                    }  
-                }
-            }
-        }
+        
     </script>
+
+    <script>
+	 		document.getElementById('inputDisplay')
+                    .insertAdjacentHTML('beforeend', 
+					'<form id=\'myForm\'action=\'<?php echo "Sup turd " ?>\' method=\'post\' > \
+             		<br> \
+             		<input type=\'hidden\' name=\'action\' value=\'post_to_DB\'> \
+              		<input type=\'submit\' name=\'submit\' value=\'Add to database\'> \
+            		<input id=\'class0\' type=\'text\' name=\'class[0]\' placeholder=\'Klasse nr. 1\' pattern=\'[1-3]\.[a-z]{1,2}\' title=\'Format: 3.x, 2.a, 3.ux,...\'> \
+            		<input id=\'gradYear0\' type=\'text\' name=\'gradYear[0]\' placeholder=\'Dimittend år nr. 1\' pattern=\'[0-9]{4}\' title=\'Format: 2019, 1988, 2006...\'> \
+            		<input id=\'time0\' type=\'text\' name=\'time[0]\' placeholder=\'Tidspunkt nr. 1\' pattern=\'[0-2]{1}[0-9]{1}:[0-6]{1}[0-9]{1}\' title=\'Format: 12:34, 14:40, 09:36,...\'> <br> \
+        </form>'); 
+	</script>
+
 
     <button onclick="deleteEle();" method="post">Remove Element</button> <form method="post"><input type="submit" name="clearPost"  value="Clear $_POST"></form>
         <form id="myForm"  method="post" > <!--Change the action to the page you want to submit the form to. action="https://www.example.com/submit" <input type="hidden" name="action" value="post_to_DB">-->
@@ -51,10 +46,15 @@
 
         <script> 
             var optionNumber = 1; //The first option to be added is number 1 
-            const idList = ["class", "gradYear", "time"]; //List of the first part of the id
-            const placeholderList = ["Klasse nr.", "Dimittend år nr.", "Tidspunkt nr."];   //List of the first part of the placeholder
 
-            function addOption() { 
+            /** function addOption() adds a new set of input fields for class, graduation year and time to the form. 
+             *  @param void
+             *  @return void
+             */
+
+            function addOption() {
+                const idList = ["class", "gradYear", "time"]; //List of the first part of the id
+                const placeholderList = ["Klasse nr.", "Dimittend år nr.", "Tidspunkt nr."];   //List of the first part of the placeholder 
                 var theForm = document.getElementById("myForm"); //Get the form element
 
                 for (let i= 0; i < 3; i++) {
@@ -74,6 +74,27 @@
                     }
                 }
 				optionNumber++;
+            }
+
+            /** Check all checkboxes with the name starting with "checkbox_" when the "Check all" checkbox is checked, and uncheck them when it is unchecked.
+            *  @param object initial_checkbox The "Check all" checkbox that was clicked.
+            *  @return void
+            */
+            function check_all(initial_checkbox) {
+                var checkboxes = document.querySelectorAll('input[type=\"checkbox\"]'); //Get all checkboxes on the page
+                if (initial_checkbox.checked) { //If the "Check all" checkbox is checked, check all checkboxes with the name starting with "checkbox_"
+                    for (let checkbox of checkboxes) {
+                        if (checkbox.name.startsWith("checkbox_") && !checkbox.checked) { //If the checkbox is one of the checkboxes to be checked and is not already checked, check it
+                            checkbox.checked = true;
+                        }  
+                    }
+                } else {
+                    for (let checkbox of checkboxes) {
+                        if (checkbox.name.startsWith("checkbox_") && checkbox.checked) {
+                            checkbox.checked = false;
+                        }  
+                    }
+                }
             }
         </script>
     </body>
@@ -144,6 +165,11 @@ clearPOST();
 
 //----------- admin-post.php -----------
 
+/**
+ * Check which action the form is calling.
+ * @param object $conn The database connection.
+ * @return void.
+ */
 function checkForAddTimeOrDeleteEntry($conn) {
     if (isset($_POST["delete"])) {
         deleteFromDB($conn);
@@ -153,6 +179,11 @@ function checkForAddTimeOrDeleteEntry($conn) {
     }
 }
 
+/**
+ *  Delete the selected classes from the database.
+ *  @param object $conn The database connection.
+ *  @return void
+ */
 function deleteFromDB($conn) {
     $checkedBoxes = getArrayOfCheckedBoxes();
     foreach ($checkedBoxes as $time) {
@@ -166,6 +197,11 @@ function deleteFromDB($conn) {
     } 
 }
 
+/**
+ *  Filter time input.
+ *  @param string $addedTime The time to filter.
+ *  @return int The filtered time in minutes.
+ */
 function filterExtraTimeInput($addedTime) {
     if (filter_var($addedTime, FILTER_VALIDATE_INT, array("options" => array("min_range" => -720, "max_range" => 720)))) {
         return $addedTime;
@@ -174,15 +210,20 @@ function filterExtraTimeInput($addedTime) {
     }
 }
 
+/**
+ *  Add time to the selected classes in the database.
+ *  @param object $conn The database connection.
+ *  @return void
+ */
 function addTimeToSelected($conn) {
     $checkedBoxes = getArrayOfCheckedBoxes();
     $addedTime = filterExtraTimeInput($_POST["addedTime"]);
     $hours = intdiv($addedTime, 60);
     $minutes = $addedTime % 60;
     foreach ($checkedBoxes as $time) {
-        $sqlQuerry = "UPDATE queue SET time = ADDTIME(time, '{$hours}:{$minutes}:00') WHERE time = '{$time}'";
+        $sqlQuery = "UPDATE queue SET time = ADDTIME(time, '{$hours}:{$minutes}:00') WHERE time = '{$time}'";
         try {
-            mysqli_query($conn, $sqlQuerry);
+            mysqli_query($conn, $sqlQuery);
             echo "Time added";
         } catch (mysqli_sql_exception $e) {
             echo 'Database error: ' . mysqli_error($conn);
@@ -190,6 +231,12 @@ function addTimeToSelected($conn) {
     }
 }
 
+
+/**
+ *  Check if the checkbox ID is correct.
+ *  @param string $checkboxID The checkbox ID to check.
+ *  @return bool True if the checkbox ID is correct, false otherwise.
+ */
 function checkIfCorrectCheckBoxID($checkboxID){
     if (!strcmp(substr($checkboxID, 0, 9), "checkbox_")) {
         return true;
@@ -198,6 +245,11 @@ function checkIfCorrectCheckBoxID($checkboxID){
     }
 }
 
+
+/**
+ *  Get an array of the checked boxes.
+ *  @return array The array of checked boxes.
+ */
 function getArrayOfCheckedBoxes() {
     $checkedBoxes = array();
     foreach ($_POST as $key => $value) {
@@ -208,6 +260,11 @@ function getArrayOfCheckedBoxes() {
     return $checkedBoxes;
 }
 
+/**
+ *  Get the database ID from the checkbox ID.
+ *  @param string $checkboxID The checkbox ID.
+ *  @return string The database ID.
+ */
 function getDatabaseIDFromCheckBoxID($checkboxID) {
     $databaseID = substr($checkboxID, 9);
     return str_replace("_", ":", $databaseID);
@@ -314,5 +371,9 @@ mysqli_close($conn);
  *       echo 'Database error: ' . mysqli_error($conn);
  *   }
  */
+
+
+
+
 
 ?>

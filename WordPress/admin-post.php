@@ -31,7 +31,115 @@ do_action( 'admin_init' );
  * 
  */
 
+// ------------------------ Removing to Database Functions ------------------------
 
+// add_action( 'admin_post_edit_database', 'checkForAddTimeOrDeleteEntry' );
+add_action( 'admin_post_nopriv_edit_database', 'checkForAddTimeOrDeleteEntry' );
+
+/**
+ * Check which action the form is calling.
+ * @param void.
+ * @return void.
+ */
+function checkForAddTimeOrDeleteEntry($conn) {
+    if (isset($_POST["delete"])) {
+        deleteFromDB();
+    } else if (isset($_POST["addTime"])) {
+        addTimeToSelected();
+    }
+	wp_safe_redirect('https://kristiansenz.com/queueadmin/'); //Change this to the page you want to redirect to after the form is submitted
+	exit();
+}
+
+/**
+ *  Delete the selected classes from the database.
+ *  @param object $conn The database connection.
+ *  @return void
+ */
+function deleteFromDB() {
+	global $wpdb;
+    $checkedBoxes = getArrayOfCheckedBoxes();
+    foreach ($checkedBoxes as $time) {
+        $sqlQuery = "DELETE FROM queue WHERE time = '{$time}'";;
+        try {
+			if (!filter_var($time, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[0-2][0-9]:[0-5][0-9]:00$/")))) {
+				throw new Exception("{$time} is an Invalid time. Something went wrong when trying to delete the class with time {$time} from the database. Check if the time is correct and try again.");
+			} 
+			if (!$wpdb->query($sqlQuery)) {
+				throw new Exception(print_r($wpdb->last_error));
+			}
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+}
+
+/**
+ *  Add time to the selected classes in the database.
+ *  @param object $conn The database connection.
+ *  @return void
+ */
+function addTimeToSelected() {
+    global $wpdb;
+	try {
+		$addedTime = filterExtraTimeInput($_POST["addedTime"]);
+	} catch (Exception $e) {
+		echo $e->getMessage();
+	}
+	$checkedBoxes = getArrayOfCheckedBoxes();
+    $hours = intdiv($addedTime, 60);
+    $minutes = $addedTime % 60;
+    foreach ($checkedBoxes as $time) {
+        $sqlQuery = "UPDATE queue SET time = ADDTIME(time, '{$hours}:{$minutes}:00') WHERE time = '{$time}'";
+        try {
+            if (!$wpdb->query($sqlQuery)) {
+				throw new Exception(print_r($wpdb->last_error));
+			}
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+}
+
+/**
+ *  Check if the checkbox ID is correct.
+ *  @param string $checkboxID The checkbox ID to check.
+ *  @return bool True if the checkbox ID is correct, false otherwise.
+ */
+function checkIfCorrectCheckBoxID($checkboxID){
+    if (!strcmp(substr($checkboxID, 0, 9), "checkbox_")) {
+        return true;
+    } else  {
+        return false;
+    }
+}
+
+
+/**
+ *  Get an array of the checked boxes.
+ *  @return array The array of checked boxes.
+ */
+function getArrayOfCheckedBoxes() {
+    $checkedBoxes = array();
+    foreach ($_POST as $key => $value) {
+        if (checkIfCorrectCheckBoxID($key) and $value == "on") { //If the checkbox is checked, the value will be "on"
+            array_push($checkedBoxes, getDatabaseIDFromCheckBoxID($key));
+        }
+    }
+    return $checkedBoxes;
+}
+
+/**
+ *  Get the database ID from the checkbox ID.
+ *  @param string $checkboxID The checkbox ID.
+ *  @return string The database ID.
+ */
+function getDatabaseIDFromCheckBoxID($checkboxID) {
+    $databaseID = substr($checkboxID, 9);
+    return str_replace("_", ":", $databaseID);
+}
+
+// ------------------------ Adding to Database Functions ------------------------
 /**
  *  Change the time format to HH:MM:SS.
  *  @param string $time The time to change.
@@ -49,10 +157,12 @@ function changeTimeFormat($time) {
  *  @return string The filtered time.
  */
 function filterTime($time) {
-    $time = filter_var($time, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[0-2][0-9]:[0-5][0-9]$/")));
-    return $time;
+    if (!filter_var($time, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[0-2][0-9]:[0-5][0-9]$/")))){
+        throw new Exception("{$time} is not an integer. Please enter time as number of minutes to be added.");
+    } else {
+		return $time;
+	}
 }
-
 
 /**
  *  Filter the graduation year to ensure it is valid. By validating that it is an integer and has 4 digits.
@@ -97,13 +207,12 @@ function addToDB(){
 			if (!$wpdb->insert("Queue", $data)) {
 				throw new Exception(print_r($wpdb->last_error) ."<br> Something went wrong when intserting the class {$gradYear} {$class} with time {$time} data. Check if the data is correct or is a duplication and try again." );
 			}
-			wp_safe_redirect('https://kristiansenz.com/queueadmin/'); //Change this to the page you want to redirect to after the form is submitted
-			exit();
-
 		} catch (Exception $e) {
 		echo $e->getMessage();
 		}
 	}
+	wp_safe_redirect('https://kristiansenz.com/queueadmin/'); //Change this to the page you want to redirect to after the form is submitted
+	exit();
 }
 
 //add_action( 'admin_post_post_to_DB', 'testfunc3' );
