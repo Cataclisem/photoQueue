@@ -219,6 +219,9 @@ function addTimeToSelected($conn) {
     $hours = intdiv($addedTime, 60);
     $minutes = $addedTime % 60;
     $checkedBoxes = getArrayOfCheckedBoxes();
+    if ($addedTime < 0) { //If the added time is negative, reverse the order of the checked boxes to avoid time conflicts in the database
+        $checkedBoxes = array_reverse($checkedBoxes);
+    }
     foreach ($checkedBoxes as $time) {
         $sqlQuery = "UPDATE queue SET time = ADDTIME(time, '{$hours}:{$minutes}:00') WHERE time = '{$time}'";
         mysqli_query($conn, $sqlQuery);

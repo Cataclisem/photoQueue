@@ -67,7 +67,7 @@ function deleteFromDB() {
     $checkedBoxes = getArrayOfCheckedBoxes();
     foreach ($checkedBoxes as $time) {
         $sqlQuery = "DELETE FROM Queue WHERE time = '{$time}'";;
-		if (!filter_var($time, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[0-2][0-9]:[0-5][0-9]:00$/")))) {
+		if (!filter_var($time, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^-?[0-2][0-9]:[0-5][0-9]:00$/")))) {
 			throw new Exception("{$time} is an Invalid time. Something went wrong when trying to delete the class with time {$time} from the database. Check if the time is correct and try again.");
 		} 
 		if (!$wpdb->query($sqlQuery)) {
@@ -83,14 +83,14 @@ function deleteFromDB() {
  */
 function addTimeToSelected() {
     global $wpdb;
-	try {
-		$addedTime = filterExtraTimeInput($_POST["addedTime"]);
-	} catch (Exception $e) {
-		echo $e->getMessage();
-	}
+	echo "<script> alert(";
+	$addedTime = filterExtraTimeInput($_POST["addedTime"]);
 	$checkedBoxes = getArrayOfCheckedBoxes();
     $hours = intdiv($addedTime, 60);
     $minutes = $addedTime % 60;
+	if ($addedTime > 0) { //If the added time is negative, reverse the order of the checked boxes to avoid time conflicts in the database
+        $checkedBoxes = array_reverse($checkedBoxes);
+    }
     foreach ($checkedBoxes as $time) {
         $sqlQuery = "UPDATE Queue SET time = ADDTIME(time, '{$hours}:{$minutes}:00') WHERE time = '{$time}'";
         if (!$wpdb->query($sqlQuery)) {
@@ -108,7 +108,7 @@ function filterExtraTimeInput($addedTime) {
     if (filter_var($addedTime, FILTER_VALIDATE_INT, array("options" => array("min_range" => -720, "max_range" => 720)))) {
         return $addedTime;
     } else {
-        throw new Exception("{$addedTime} is an Invalid time to add. Please enter a positive integer.");
+        throw new Exception("{$addedTime} is an Invalid time to add. Please enter a integer.");
     }
 }
 
