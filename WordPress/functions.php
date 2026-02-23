@@ -165,7 +165,7 @@ function getDatabaseIDFromCheckBoxID($checkboxID) {
  * @throws Exception If the checkbox ID is not in the correct format.
  */
 function filterCheckboxID($checkboxID) {
-    if (filter_var($checkboxID, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[0-2][0-9]:[0-6][0-9]$/")))) {
+    if (filter_var($checkboxID, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[0-2][0-9]:[0-6][0-9]:00$/")))) {
         return $checkboxID;
     } else {
         throw new Exception("{$checkboxID} is an Invalid checkbox ID");
@@ -263,7 +263,7 @@ function exception_return()
 
 // ------------------------ Displaying Database Functions ------------------------
 
-function printDB(){
+function adminPrintDB(){
 	// -> works like . in java , so "$wpdb->get_results" would be "wpdb.get_results" in java
 	global $wpdb;
 	$result = $wpdb->get_results ( 'SELECT * FROM Queue' );
@@ -276,19 +276,35 @@ function HTMLDisplayString($result = array()) {
         $time = substr($row->time, 0, -3);
         $cleanID = str_replace(":", "_", $row->time);
             echo "<script>
-                document.getElementById('DataBaseDisplay')
-                    .insertAdjacentHTML('beforeend', 
-                        '<div id=\"{$cleanID}\" name=\"{$cleanID}\"> \
-                            <input type=\"checkbox\" name=\"checkbox_{$cleanID}\"> \
-                            <h4 style=\"display:inline\">{$row->class} </h4> \
-                            <h4 style=\"display:inline\">{$row->gradYear} </h4> \
-                            <h4 style=\"display:inline\">{$time} </h4>\
-                        </div> <br>'); 
-                document.getElementById('DataBaseDisplay')
-                    .insertAdjacentHTML('beforeend', 
-                        '<hr id=\"{$cleanID}\" style=\"width:80%;text-align:centered;margin-left:10%\">');
+                document.getElementById('adminDisplayTable')
+                    .insertAdjacentHTML('beforeend',
+                            '<td> <input type=\"checkbox\" name=\"checkbox_{$cleanID}\"> {$row->class} </td> \
+                            <td>{$row->gradYear} </td> \
+                            <td>{$time} </td>');
                 </script>";
     }
+}
+
+function printDB() {
+	global $wpdb;
+	$result = $wpdb->get_results ( 'SELECT * FROM Queue' );
+	foreach ($result as $row) {
+        $time = substr($row->time, 0, -3);
+		if (!strcmp($row->class, "Årgang")) {
+			$gradYear = $row->gradYear;
+		} else {
+			$gradYear = "";
+		}
+       	echo "<script>
+			document.getElementById('displayTable')
+                    .insertAdjacentHTML('beforeend', 
+                        '<tr> \
+                            <td>{$row->class} {$gradYear} </td>\
+							<td>{$row->gradYear}</td>\
+							<td>{$time}</td>\
+                        </tr>'); 
+                </script>";
+	}
 }
 
 //Action takes place during WP hook (Someplace in the loading of the site the 'wp' "hook" is activated and we do the action)
@@ -296,6 +312,11 @@ add_action('shutdown', 'page_check');
 //Check if page is queueadmin else do nothing
 function page_check() {
 	if (is_page('queueadmin')) {
+		adminPrintDB();
+	} elseif (is_page('photo-queue')) {
 		printDB();
 	}
 }
+
+
+
