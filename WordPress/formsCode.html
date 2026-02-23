@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-        <form id="myForm" action="https://www.example.com/submit" method="post" > <!--Change the action to the page you want to submit the form to-->
+        <form id="submitForm" action="https://www.example.com/submit" method="post" > <!--Change the action to the page you want to submit the form to-->
              <br>
              <input type="hidden" name="action" value="post_to_DB">
               <input type="submit" name="submit" value="submit">
@@ -22,7 +22,7 @@
             const placeholderList = ["Klasse nr.", "Dimittend år nr.", "Tidspunkt nr."];   //List of the first part of the placeholder
 
             function addOption() { 
-                var theForm = document.getElementById("myForm"); //Get the form element
+                var theForm = document.getElementById("submitForm"); //Get the form element
 
                 for (let i= 0; i < 3; i++) {
 
@@ -42,6 +42,37 @@
                 }
                 theForm.appendChild(document.createElement("br"));
 				optionNumber++;
+            }
+        </script>
+
+        <!-- Displaying database content -->
+
+        <form id="DataBaseDisplay" action="https://www.kristiansenz.com/wp-admin/admin-post.php/" method="post" > <br>
+            <input type="submit" name="delete" value="Delete From DataBase"> <input type="submit" name="addTime" value="Add time to selected: "><input type="number" name="addedTime" placeholder="Minutes" min=-720 max=720>
+            <input type="hidden" name="action" value="edit_database">
+            <input type="checkbox" name="checkall" value="Check All" onClick="check_all(this.form['checkall']);"> Check all<br>
+        </form> 
+
+         <script>
+        /** Check all checkboxes with the name starting with "checkbox_" when the "Check all" checkbox is checked, and uncheck them when it is unchecked.
+            *  @param object initial_checkbox The "Check all" checkbox that was clicked.
+            *  @return void
+            */
+            function check_all(initial_checkbox) {
+                var checkboxes = document.querySelectorAll('input[type=\"checkbox\"]'); //Get all checkboxes on the page
+                if (initial_checkbox.checked) { //If the "Check all" checkbox is checked, check all checkboxes with the name starting with "checkbox_"
+                    for (let checkbox of checkboxes) {
+                        if (checkbox.name.startsWith("checkbox_") && !checkbox.checked) { //If the checkbox is one of the checkboxes to be checked and is not already checked, check it
+                            checkbox.checked = true;
+                        }  
+                    }
+                } else {
+                    for (let checkbox of checkboxes) {
+                        if (checkbox.name.startsWith("checkbox_") && checkbox.checked) {
+                            checkbox.checked = false;
+                        }  
+                    }
+                }
             }
         </script>
     </body>

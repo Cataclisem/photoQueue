@@ -1,61 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
-   <body>
-    <script>
-        function deleteEle() {
-            document.getElementById("10:00:00").remove();
-        }
-
-        
-    </script>
-
-    <script>
-	 		document.getElementById('inputDisplay')
-                    .insertAdjacentHTML('beforeend', 
-					'<form id=\'myForm\'action=\'<?php echo "Sup turd " ?>\' method=\'post\' > \
-             		<br> \
-             		<input type=\'hidden\' name=\'action\' value=\'post_to_DB\'> \
-              		<input type=\'submit\' name=\'submit\' value=\'Add to database\'> \
-            		<input id=\'class0\' type=\'text\' name=\'class[0]\' placeholder=\'Klasse nr. 1\' pattern=\'[1-3]\.[a-z]{1,2}\' title=\'Format: 3.x, 2.a, 3.ux,...\'> \
-            		<input id=\'gradYear0\' type=\'text\' name=\'gradYear[0]\' placeholder=\'Dimittend år nr. 1\' pattern=\'[0-9]{4}\' title=\'Format: 2019, 1988, 2006...\'> \
-            		<input id=\'time0\' type=\'text\' name=\'time[0]\' placeholder=\'Tidspunkt nr. 1\' pattern=\'[0-2]{1}[0-9]{1}:[0-6]{1}[0-9]{1}\' title=\'Format: 12:34, 14:40, 09:36,...\'> <br> \
-        </form>'); 
-	</script>
-
-
-    <button onclick="deleteEle();" method="post">Remove Element</button> <form method="post"><input type="submit" name="clearPost"  value="Clear $_POST"></form>
-        <form id="myForm"  method="post" > <!--Change the action to the page you want to submit the form to. action="https://www.example.com/submit" <input type="hidden" name="action" value="post_to_DB">-->
-            <input type="submit" name="submit_to_DB" value="Submit to DataBase"><br>
+<body>
+        <form id="submitForm" action="https://www.example.com/submit" method="post" > <!--Change the action to the page you want to submit the form to-->
+             <br>
+             <input type="hidden" name="action" value="post_to_DB">
+              <input type="submit" name="submit" value="submit">
             <input id="class0" type="text" name="class[0]" placeholder="Klasse nr. 1" pattern="[1-3]\.[a-z]{1,2}" title="Format: 3.x, 2.a, 3.ux,..."> 
             <input id="gradYear0" type="text" name="gradYear[0]" placeholder="Dimittend år nr. 1" pattern="[0-9]{4}" title="Format: 2019, 1988, 2006...">
-            <input id="time0" type="text" name="time[0]" placeholder="Tidspunkt nr. 1" pattern="[0-2]{1}[0-9]{1}:[0-6]{1}[0-9]{1}" title="Format: 12:34, 14:40, 09:36,..."> <br> 
+            <input id="time0" type="text" name="time[0]" placeholder="Tidspunkt nr. 1" pattern="[0-2]{1}[0-9]{1}:[0-6]{1}[0-9]{1}" title="Format: 12:34, 14:40, 09:36,..."> <br>
         </form> 
         <button onclick="addOption();">Add Class</button> 
 
-       <form id="DataBaseDisplay" method="post" > <br>
-        <input type="submit" name="delete" value="Delete From DataBase"> <input type="submit" name="addTime" value="Add time to selected: "><input type="number" name="addedTime" placeholder="Minutes" min=-720 max=720>
-        <input type="hidden" name="action" value="edit_database">
-        <input type="checkbox" name="checkall" value="Check All" onClick="check_all(this.form['checkall']);">Check all<br>
-        </form> 
-
         <script> 
             var optionNumber = 1; //The first option to be added is number 1 
+            const idList = ["class", "gradYear", "time"]; //List of the first part of the id
+            const placeholderList = ["Klasse nr.", "Dimittend år nr.", "Tidspunkt nr."];   //List of the first part of the placeholder
 
-            /** function addOption() adds a new set of input fields for class, graduation year and time to the form. 
-             *  @param void
-             *  @return void
-             */
-
-            function addOption() {
-                const idList = ["class", "gradYear", "time"]; //List of the first part of the id
-                const placeholderList = ["Klasse nr.", "Dimittend år nr.", "Tidspunkt nr."];   //List of the first part of the placeholder 
-                var theForm = document.getElementById("myForm"); //Get the form element
+            function addOption() { 
+                var theForm = document.getElementById("submitForm"); //Get the form element
 
                 for (let i= 0; i < 3; i++) {
 
@@ -64,13 +31,30 @@
                     newOption.name = idList[i] + "[" + optionNumber + "]"; 
                     newOption.type = "text"; 
                     newOption.placeholder = placeholderList[i] + " " + (optionNumber + 1);
+
+                    if (i == 3) {    //If the input is the last one, add a line break after it
+                        theForm.appendChild(newOption)
+                        
+                    }
+                    else {
                     theForm.appendChild(newOption); 
-                }  
+                    }
+                }
                 theForm.appendChild(document.createElement("br"));
 				optionNumber++;
             }
+        </script>
 
-            /** Check all checkboxes with the name starting with "checkbox_" when the "Check all" checkbox is checked, and uncheck them when it is unchecked.
+        <!-- Displaying database content -->
+
+        <form id="DataBaseDisplay" action="https://www.kristiansenz.com/wp-admin/admin-post.php/" method="post" > <br>
+            <input type="submit" name="delete" value="Delete From DataBase"> <input type="submit" name="addTime" value="Add time to selected: "><input type="number" name="addedTime" placeholder="Minutes" min=-720 max=720>
+            <input type="hidden" name="action" value="edit_database">
+            <input type="checkbox" name="checkall" value="Check All" onClick="check_all(this.form['checkall']);"> Check all<br>
+        </form> 
+
+         <script>
+        /** Check all checkboxes with the name starting with "checkbox_" when the "Check all" checkbox is checked, and uncheck them when it is unchecked.
             *  @param object initial_checkbox The "Check all" checkbox that was clicked.
             *  @return void
             */
