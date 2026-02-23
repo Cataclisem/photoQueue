@@ -42,8 +42,7 @@ add_action('admin_post_nopriv_edit_database', 'checkForAddTimeOrDeleteEntry');
  * @param void.
  * @return void.
  */
-function checkForAddTimeOrDeleteEntry($conn)
-{
+function checkForAddTimeOrDeleteEntry() {
 	try {
 		if (isset($_POST["delete"])) {
 			deleteFromDB();
@@ -65,8 +64,7 @@ function checkForAddTimeOrDeleteEntry($conn)
  *  @param object $conn The database connection.
  *  @return void
  */
-function deleteFromDB()
-{
+function deleteFromDB() {
 	global $wpdb;
 	$checkedBoxes = getArrayOfCheckedBoxes();
 	foreach ($checkedBoxes as $time) {
@@ -85,24 +83,20 @@ function deleteFromDB()
  *  @param object $conn The database connection.
  *  @return void
  */
-function addTimeToSelected()
-{
+function addTimeToSelected() {
 	global $wpdb;
-	$addedTime = abs(filterExtraTimeInput($_POST["addedTime"]));
+	$addedTime = filterExtraTimeInput($_POST["addedTime"]);
 	$checkedBoxes = getArrayOfCheckedBoxes();
-	$hours = intdiv($addedTime, 60);
-	$minutes = $addedTime % 60;
-	$leading = "-0";
+	$hours = abs(intdiv($addedTime, 60));
+	$minutes = abs($addedTime % 60);
+	$leading = "-";
 	if ($addedTime > 0) { //If the added time is positive, reverse the order of the checked boxes to avoid time conflicts in the database
 		$checkedBoxes = array_reverse($checkedBoxes);
-		$leading = "0";
+		$leading = "";
 	}
 	foreach ($checkedBoxes as $time) {
 		$sqlQuery = "UPDATE Queue SET time = ADDTIME(time, '{$leading}{$hours}:{$minutes}:00') WHERE time = '{$time}'";
-		print_r($sqlQuery);
-		exit();
 		if (!$wpdb->query($sqlQuery)) {
-			//print_r($sqlQuery);
 			throw new Exception(print_r($wpdb->last_error));
 		}
 	}

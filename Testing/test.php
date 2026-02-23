@@ -369,8 +369,4 @@ mysqli_close($conn);
  *   }
  */
 
-
-
-
-
 ?>
