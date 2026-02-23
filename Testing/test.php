@@ -64,15 +64,9 @@
                     newOption.name = idList[i] + "[" + optionNumber + "]"; 
                     newOption.type = "text"; 
                     newOption.placeholder = placeholderList[i] + " " + (optionNumber + 1);
-
-                    if (i == 2) {    //If the input is the last one, add a line break after it
-                        theForm.appendChild(newOption)
-                        theForm.appendChild(document.createElement("br"));
-                    }
-                    else {
                     theForm.appendChild(newOption); 
-                    }
-                }
+                }  
+                theForm.appendChild(document.createElement("br"));
 				optionNumber++;
             }
 
@@ -265,6 +259,14 @@ function getArrayOfCheckedBoxes() {
 function getDatabaseIDFromCheckBoxID($checkboxID) {
     $databaseID = substr($checkboxID, 9);
     return str_replace("_", ":", $databaseID);
+}
+
+function filterCheckboxID($checkboxID) {
+    if (filter_var($checkboxID, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[0-2][0-9]:[0-6][0-9]$/")))) {
+        return $checkboxID;
+    } else {
+        throw new Exception("{$checkboxID} is an Invalid checkbox ID");
+    }
 }
 
 //----------- Inserting Classes into Database -----------

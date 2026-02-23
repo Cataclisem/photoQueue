@@ -155,7 +155,21 @@ function getArrayOfCheckedBoxes() {
  */
 function getDatabaseIDFromCheckBoxID($checkboxID) {
 	$databaseID = substr($checkboxID, 9);
-	return str_replace("_", ":", $databaseID);
+	return filterCheckboxID(str_replace("_", ":", $databaseID));
+}
+
+/**
+ * Sanitize the checkbox ID to ensure it is in the correct format.
+ * @param string $checkboxID The checkbox ID to sanitize.
+ * @return string The sanitized checkbox ID.
+ * @throws Exception If the checkbox ID is not in the correct format.
+ */
+function filterCheckboxID($checkboxID) {
+    if (filter_var($checkboxID, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[0-2][0-9]:[0-6][0-9]$/")))) {
+        return $checkboxID;
+    } else {
+        throw new Exception("{$checkboxID} is an Invalid checkbox ID");
+    }
 }
 
 // ------------------------ Adding to Database Functions ------------------------
@@ -260,11 +274,20 @@ function printDB(){
 function HTMLDisplayString($result = array()) {
 	foreach ($result as $row) {
         $time = substr($row->time, 0, -3);
+        $cleanID = str_replace(":", "_", $row->time);
             echo "<script>
-            document.getElementById('DataBaseDisplay').insertAdjacentHTML('beforeend', '<div id=\"{$time}:00\"> <input type=\"checkbox\"> <h4 style=\"display:inline\">{$row->class} </h4> <h4 style=\"display:inline\">{$row->gradYear} </h4> <h4 style=\"display:inline\">{$time} </h4> </div> <br>'); 
-                document.getElementById('DataBaseDisplay').insertAdjacentHTML('beforeend', '<hr id=\"{$time}:00\" style=\"width:80%;text-align:centered;margin-left:10%\">');
-                </script>
-            ";
+                document.getElementById('DataBaseDisplay')
+                    .insertAdjacentHTML('beforeend', 
+                        '<div id=\"{$cleanID}\" name=\"{$cleanID}\"> \
+                            <input type=\"checkbox\" name=\"checkbox_{$cleanID}\"> \
+                            <h4 style=\"display:inline\">{$row->class} </h4> \
+                            <h4 style=\"display:inline\">{$row->gradYear} </h4> \
+                            <h4 style=\"display:inline\">{$time} </h4>\
+                        </div> <br>'); 
+                document.getElementById('DataBaseDisplay')
+                    .insertAdjacentHTML('beforeend', 
+                        '<hr id=\"{$cleanID}\" style=\"width:80%;text-align:centered;margin-left:10%\">');
+                </script>";
     }
 }
 
@@ -274,7 +297,5 @@ add_action('shutdown', 'page_check');
 function page_check() {
 	if (is_page('queueadmin')) {
 		printDB();
-		//add_action('post_to_DB', 'testFunc2');
-		//add_action('admin_post_post_to_DB', 'addToDB');
 	}
 }
