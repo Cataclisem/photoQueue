@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-        <form id="submitForm" action="https://www.example.com/submit" method="post" > <!--Change the action to the page you want to submit the form to-->
+        <form id="submitForm" action="" method="post" > <!--Change the action to the page you want to submit the form to-->
              <br>
              <input type="hidden" name="action" value="post_to_DB">
               <input type="submit" name="submit" value="submit">
@@ -47,7 +47,7 @@
 
         <!-- Displaying database content -->
 
-        <form id="DataBaseDisplay" action="https://www.kristiansenz.com/wp-admin/admin-post.php/" method="post" > <br>
+        <form id="DataBaseDisplay" action="" method="post" > <br> <!--Change the action to the page you want to submit the form to-->
             <input type="submit" name="delete" value="Delete From DataBase"> <input type="submit" name="addTime" value="Add time to selected: "><input type="number" name="addedTime" placeholder="Minutes" min=-720 max=720>
             <input type="hidden" name="action" value="edit_database">
             <input type="checkbox" name="checkall" value="Check All" onClick="check_all(this.form['checkall']);"> Check all<br>
