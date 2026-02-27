@@ -8,7 +8,7 @@ The wordpress page is run locally with localWP, with the plugins "Elementor" and
 
 The display pages are made using elementors "html" widget and the "backend" stuff is contained in the "../wp-content/themes/hello-elementor/functions.php"
 
-Also th it is not good and is currently being made into a plugin instead.
+Also it is not good and is currently being made into a plugin instead.
 
 ## How to use
 First don't.
