@@ -1,0 +1,73 @@
+[27-Feb-2026 12:35:06 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function hello_elementor_display_header_footer() in C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\header.php:35
+Stack trace:
+#0 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template.php(814): require_once()
+#1 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template.php(749): load_template('C:\\Users\\chris\\...', true, Array)
+#2 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\general-template.php(48): locate_template(Array, true, true, Array)
+#3 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\index.php(14): get_header()
+#4 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template-loader.php(125): include('C:\\Users\\chris\\...')
+#5 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-blog-header.php(19): require_once('C:\\Users\\chris\\...')
+#6 C:\Users\chris\Local Sites\photoqueuesite\app\public\index.php(17): require('C:\\Users\\chris\\...')
+#7 {main}
+  thrown in C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\header.php on line 35
+[27-Feb-2026 12:35:07 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function hello_elementor_display_header_footer() in C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\header.php:35
+Stack trace:
+#0 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template.php(814): require_once()
+#1 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template.php(749): load_template('C:\\Users\\chris\\...', true, Array)
+#2 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\general-template.php(48): locate_template(Array, true, true, Array)
+#3 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\index.php(14): get_header()
+#4 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template-loader.php(125): include('C:\\Users\\chris\\...')
+#5 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-blog-header.php(19): require_once('C:\\Users\\chris\\...')
+#6 C:\Users\chris\Local Sites\photoqueuesite\app\public\index.php(17): require('C:\\Users\\chris\\...')
+#7 {main}
+  thrown in C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\header.php on line 35
+[27-Feb-2026 12:35:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function hello_elementor_display_header_footer() in C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\header.php:35
+Stack trace:
+#0 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template.php(814): require_once()
+#1 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template.php(749): load_template('C:\\Users\\chris\\...', true, Array)
+#2 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\general-template.php(48): locate_template(Array, true, true, Array)
+#3 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\index.php(14): get_header()
+#4 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template-loader.php(125): include('C:\\Users\\chris\\...')
+#5 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-blog-header.php(19): require_once('C:\\Users\\chris\\...')
+#6 C:\Users\chris\Local Sites\photoqueuesite\app\public\index.php(17): require('C:\\Users\\chris\\...')
+#7 {main}
+  thrown in C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\header.php on line 35
+[27-Feb-2026 12:35:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function hello_elementor_display_header_footer() in C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\header.php:35
+Stack trace:
+#0 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template.php(814): require_once()
+#1 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template.php(749): load_template('C:\\Users\\chris\\...', true, Array)
+#2 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\general-template.php(48): locate_template(Array, true, true, Array)
+#3 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\index.php(14): get_header()
+#4 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template-loader.php(125): include('C:\\Users\\chris\\...')
+#5 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-blog-header.php(19): require_once('C:\\Users\\chris\\...')
+#6 C:\Users\chris\Local Sites\photoqueuesite\app\public\index.php(17): require('C:\\Users\\chris\\...')
+#7 {main}
+  thrown in C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\header.php on line 35
+[27-Feb-2026 12:35:14 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function hello_elementor_display_header_footer() in C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\header.php:35
+Stack trace:
+#0 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template.php(814): require_once()
+#1 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template.php(749): load_template('C:\\Users\\chris\\...', true, Array)
+#2 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\general-template.php(48): locate_template(Array, true, true, Array)
+#3 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\index.php(14): get_header()
+#4 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template-loader.php(125): include('C:\\Users\\chris\\...')
+#5 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-blog-header.php(19): require_once('C:\\Users\\chris\\...')
+#6 C:\Users\chris\Local Sites\photoqueuesite\app\public\index.php(17): require('C:\\Users\\chris\\...')
+#7 {main}
+  thrown in C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\header.php on line 35
+[27-Feb-2026 12:35:34 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function hello_elementor_display_header_footer() in C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\header.php:35
+Stack trace:
+#0 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template.php(814): require_once()
+#1 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template.php(749): load_template('C:\\Users\\chris\\...', true, Array)
+#2 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\general-template.php(48): locate_template(Array, true, true, Array)
+#3 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\index.php(14): get_header()
+#4 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\template-loader.php(125): include('C:\\Users\\chris\\...')
+#5 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-blog-header.php(19): require_once('C:\\Users\\chris\\...')
+#6 C:\Users\chris\Local Sites\photoqueuesite\app\public\index.php(17): require('C:\\Users\\chris\\...')
+#7 {main}
+  thrown in C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-content\themes\hello-elementor\header.php on line 35
+[27-Feb-2026 13:08:56 UTC] PHP Fatal error:  Uncaught TypeError: call_user_func_array(): Argument #1 ($callback) must be a valid callback, function "testfunc3" not found or invalid function name in C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\class-wp-hook.php:341
+Stack trace:
+#0 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters('', Array)
+#1 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#2 C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-admin\admin-post.php(83): do_action('admin_post_post...')
+#3 {main}
+  thrown in C:\Users\chris\Local Sites\photoqueuesite\app\public\wp-includes\class-wp-hook.php on line 341
